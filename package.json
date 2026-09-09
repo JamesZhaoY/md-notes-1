@@ -1,0 +1,23 @@
+{
+  "name": "md-notes-1",
+  "version": "1.0.0",
+  "private": true,
+  "description": "部署在 Cloudflare Workers + D1 上的 Markdown 笔记应用",
+  "author": "Author43",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "db:create": "wrangler d1 create md-notes",
+    "db:init": "wrangler d1 execute md-notes --remote --file=./schema.sql",
+    "db:init:local": "wrangler d1 execute md-notes --local --file=./schema.sql",
+    "secret:password": "wrangler secret put AUTH_PASSWORD",
+    "vendor": "node scripts/vendor.mjs"
+  },
+  "devDependencies": {
+    "dompurify": "^3.2.0",
+    "marked": "^15.0.0",
+    "wrangler": "^4.0.0"
+  }
+}

@@ -1,0 +1,42 @@
+# Cloudflare Workers 配置
+# 文档：https://developers.cloudflare.com/workers/wrangler/configuration/
+
+name = "md-notes-1"
+main = "src/index.js"
+compatibility_date = "2025-09-01"
+
+# 部署时保留在 Cloudflare 控制台里手动添加的环境变量（例如 AUTH_PASSWORD）
+keep_vars = true
+
+# 前端静态文件（HTML/CSS/JS）直接由 Cloudflare 边缘托管，
+# 命中静态文件的请求不经过 Worker，也不计入 Worker 的每日免费请求数。
+[assets]
+directory = "./public"
+binding = "ASSETS"
+
+# D1 数据库（SQLite）
+#   命令行部署：database_id 留空即可。`npx wrangler deploy` 会自动创建名为 md-notes 的数据库
+#             并把 ID 写回这里（账号里已有同名数据库则直接复用）。
+#   控制台部署：先在控制台创建 D1 数据库，再把它的 Database ID 粘贴到下面的引号里，
+#             详见 docs/deploy-dashboard.md。
+[[d1_databases]]
+binding = "DB"
+database_name = "md-notes"
+database_id = "81b2b376-75d1-4e0b-a9fc-2a341121941b"
+
+# 在 Cloudflare 控制台查看请求日志（免费额度内）
+[observability]
+enabled = true
+
+# 访问密码（必需）：环境变量 AUTH_PASSWORD。单用户、无注册，这是唯一的登录凭据。
+# 两种设置方式二选一，不要同时用：
+#
+#   1. 推荐 —— 加密的 secret，不会进入代码仓库：
+#        npx wrangler secret put AUTH_PASSWORD
+#      （控制台操作：Worker → Settings → Variables and Secrets → Add → 类型选 Secret）
+#
+#   2. 明文环境变量，直接写在这里（仓库公开时不要这样做）：
+# [vars]
+# AUTH_PASSWORD = "一个足够长的随机密码"
+#
+# 本地开发写在 .dev.vars 文件里（参考 .dev.vars.example）。

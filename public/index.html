@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="color-scheme" content="light dark" />
+  <meta name="theme-color" content="#f4f3ef" media="(prefers-color-scheme: light)" />
+  <meta name="theme-color" content="#171716" media="(prefers-color-scheme: dark)" />
+  <title>MD Notes</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23b4530a'/%3E%3Cpath d='M9 22V10l4 6 4-6v12M20 16h4' fill='none' stroke='%23fff' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+  <noscript><p style="padding:2rem;text-align:center">MD Notes 需要启用 JavaScript。</p></noscript>
+
+  <div id="app" class="app" hidden>
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-head">
+        <div class="brand">
+          <svg width="22" height="22" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="7" fill="var(--accent)"/><path d="M9 22V10l4 6 4-6v12M20 16h4" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span>MD Notes</span>
+        </div>
+        <button id="new-note" class="icon-btn" title="新建笔记" aria-label="新建笔记">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+        </button>
+      </div>
+      <div class="search">
+        <svg class="search-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input id="search" type="search" placeholder="搜索笔记…" autocomplete="off" aria-label="搜索笔记" />
+      </div>
+      <ul id="note-list" class="note-list" role="listbox" aria-label="笔记列表"></ul>
+      <div class="sidebar-foot">
+        <span id="note-count">0 篇笔记</span>
+        <button id="logout" class="link-btn" type="button">退出</button>
+      </div>
+    </aside>
+
+    <main id="workspace" class="workspace" data-view="split">
+      <div class="toolbar">
+        <button id="menu" class="icon-btn menu-btn" type="button" title="笔记列表" aria-label="打开笔记列表">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+        </button>
+        <div id="view-seg" class="seg" role="group" aria-label="视图">
+          <button type="button" data-view="edit">编辑</button>
+          <button type="button" data-view="split">分栏</button>
+          <button type="button" data-view="preview">预览</button>
+        </div>
+        <span id="save-status" class="status" data-kind="saved" aria-live="polite"></span>
+        <div class="spacer"></div>
+        <span id="word-count" class="word-count"></span>
+        <button id="export" class="btn" type="button" title="下载为 .md 文件">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11m0 0 4-4m-4 4-4-4M5 20h14"/></svg>
+          <span>导出</span>
+        </button>
+        <button id="delete" class="btn danger" type="button" title="删除这篇笔记">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg>
+          <span>删除</span>
+        </button>
+      </div>
+
+      <div id="panes" class="panes">
+        <textarea id="editor" class="editor" placeholder="# 标题&#10;&#10;在这里开始写 Markdown……" spellcheck="false" aria-label="Markdown 编辑器"></textarea>
+        <article id="preview" class="preview prose" aria-label="预览"></article>
+      </div>
+
+      <div id="empty" class="empty" hidden>
+        <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg>
+        <p>选择左侧的笔记，或者</p>
+        <button id="empty-new" class="btn primary" type="button">新建一篇笔记</button>
+      </div>
+    </main>
+
+    <div id="backdrop" class="backdrop"></div>
+  </div>
+
+  <div id="login" class="login" hidden>
+    <form id="login-form" class="login-card" autocomplete="on">
+      <div class="brand big">
+        <svg width="30" height="30" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="7" fill="var(--accent)"/><path d="M9 22V10l4 6 4-6v12M20 16h4" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span>MD Notes</span>
+      </div>
+      <div id="login-fields">
+        <p class="muted">这是一个私人笔记本，请输入访问密码。</p>
+        <input id="login-password" type="password" placeholder="访问密码" autocomplete="current-password" required autofocus />
+        <button type="submit" class="btn primary block">进入</button>
+        <p id="login-error" class="error" role="alert"></p>
+      </div>
+      <div id="login-unconfigured" hidden>
+        <p class="muted">服务端还没有配置访问密码。请为 Worker 设置环境变量 <code>AUTH_PASSWORD</code>：</p>
+        <pre class="cmd">npx wrangler secret put AUTH_PASSWORD</pre>
+        <p class="muted">本地开发则把密码写进 <code>.dev.vars</code>，再重启 <code>wrangler dev</code>。</p>
+      </div>
+    </form>
+  </div>
+
+  <script src="/vendor/marked.min.js"></script>
+  <script src="/vendor/purify.min.js"></script>
+  <script src="/app.js"></script>
+</body>
+</html>
